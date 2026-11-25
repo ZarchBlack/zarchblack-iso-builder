@@ -138,7 +138,6 @@ exfatprogs
 f2fs-tools
 fatresize
 fuse3
-fuse3
 fuseiso
 gpart
 gparted
@@ -550,7 +549,6 @@ sddm
 sddm-kcm
 
 # -------------------- Plasma Extras & Enhancements --------------------
-kde-material-you-colors
 kdeplasma-addons
 kwin-effect-rounded-corners-git
 plasma6-applets-panel-colorizer
@@ -869,7 +867,6 @@ nbd
 numlockx
 parallel
 pv
-python-dbus
 scx-tools
 timeshift
 timeshift-autosnap
