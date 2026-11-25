@@ -3,7 +3,7 @@
 
 pkgname=zarchblack-plasma-config
 pkgver=1.0.0
-pkgrel=6
+pkgrel=7
 pkgdesc="ZarchBlack KDE Plasma default configuration - desktop layout, panels, widgets"
 arch=('any')
 url="https://github.com/ZarchBlack/zarchblack"
@@ -14,15 +14,30 @@ source=()
 sha256sums=()
 
 package() {
-  # Copy SKEL configs from staged skel directory
-  mkdir -p "${pkgdir}/etc/skel"
+  local _skel_src
+
+  # البحث عن skel/ بعدة طرق
   if [ -d "${startdir}/skel" ]; then
-    cp -r "${startdir}/skel/." "${pkgdir}/etc/skel/"
+    # skel/ بجانب PKGBUILD (المسار المثالي)
+    _skel_src="${startdir}/skel"
   else
-    # Fallback to absolute path if startdir/skel doesn't exist
-    cp -r /home/zarch/Music/project-zarch-iso/zarchblack_iso/iso/airootfs/etc/skel/. "${pkgdir}/etc/skel/"
+    # البحث التلقائي من جذر المشروع
+    local _project_root
+    _project_root="$(git -C "${startdir}" rev-parse --show-toplevel 2>/dev/null || true)"
+    if [ -n "$_project_root" ] && [ -d "${_project_root}/iso/airootfs/etc/skel" ]; then
+      _skel_src="${_project_root}/iso/airootfs/etc/skel"
+    fi
   fi
-  
+
+  mkdir -p "${pkgdir}/etc/skel"
+
+  if [ -n "$_skel_src" ] && [ -d "$_skel_src" ]; then
+    cp -r "${_skel_src}/." "${pkgdir}/etc/skel/"
+    echo "ZarchBlack Plasma Config: skel installed from ${_skel_src}"
+  else
+    echo "Warning: skel source not found — package will be empty."
+  fi
+
   mkdir -p "${pkgdir}/usr/share/zarchblack/plasma"
   echo "ZarchBlack Plasma Config ${pkgver}" > "${pkgdir}/usr/share/zarchblack/plasma/version"
 }

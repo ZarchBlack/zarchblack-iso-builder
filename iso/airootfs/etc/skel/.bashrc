@@ -33,7 +33,6 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_CACHE_HOME="$HOME/.bin"
 
 # Allow ctrl-S for history navigation (with ctrl-R)
 [[ $- == *i* ]] && stty -ixon
@@ -90,7 +89,6 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 
 # Alias's to modified commands
 alias cpi='cp -i'
-alias ping='ping -c 4'
 alias less='less -R'
 alias aria2='aria2c -x 12 -s 12'
 alias iso1='aria2c -x 12 -s 12'
@@ -100,7 +98,6 @@ alias rm='trash -v'
 alias mkdir='mkdir -p'
 alias ps='ps auxf'
 alias ping='ping -c 10'
-alias less='less -R'
 alias cls='clear'
 alias apt-get='sudo apt-get'
 alias multitail='multitail --no-repeat -c'
@@ -158,7 +155,6 @@ alias src2='sh $HOME/.bin/searchpkg'
 alias find='sh $HOME/.bin/find'
 alias replace='sh $HOME/.bin/replace'
 
-alias chris='curl -fsSL https://christitus.com/linux | sh'
 alias rsync='sudo rsync -avh --partial --progress --info=progress2'
 alias rsync2='sudo rsync -aAXHv --info=progress2'
 alias nvidia-smi='nvidia-smi --query-gpu=temperature.gpu,power.draw,utilization.gpu,utilization.memory --format=csv -l 1'
@@ -207,7 +203,6 @@ alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | n
 alias rg="rg --sort path"
 
 # Add an "alert" alias for long running commands.  Use like so:
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Count all files (recursively) in the current folder
 alias countfiles="for t in files links directories; do echo \`find . -type \${t:0:1} | wc -l\` \$t; done 2> /dev/null"
@@ -323,7 +318,7 @@ alias chroot-arch="genfstab -U /mnt >> /mnt/etc/fstab && arch-chroot /mnt"
 alias cpskel='cp -Rf /etc/skel ~/.skel-backup-$(date +%Y.%m.%d-%H.%M.%S)'
 # get fastest mirrors
 alias mirrorr="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-alias reflector="sudo pacman -Sy reflector && sudo reflector --country Bangladesh --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
+alias reflector="sudo reflector --latest 20 --sort rate --save /etc/pacman.d/mirrorlist"
 alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
 alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
 alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"

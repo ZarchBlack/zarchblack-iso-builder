@@ -739,6 +739,7 @@ adobe-source-sans-fonts
 awesome-terminal-fonts
 cantarell-fonts
 noto-fonts
+inter-font
 noto-fonts-cjk
 noto-fonts-emoji
 opendesktop-fonts
@@ -913,6 +914,7 @@ visual-studio-code-bin
 # -------------------- ZarchBlack Tooling --------------------
 zarchblack-welcome
 zarchcare
+trash-cli
 apparmor
 audit
 earlyoom
@@ -928,3 +930,4 @@ linux-firmware-atheros
 linux-firmware-mediatek
 linux-firmware-amdgpu
 dhcpcd
+neovim
