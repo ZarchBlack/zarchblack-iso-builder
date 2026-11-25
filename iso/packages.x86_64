@@ -778,6 +778,7 @@ python-pygments
 python-pyparted
 python-pyqt5
 python-pyqt6
+pyside6
 python-setuptools
 
 # -------------------- Perl (System & AUR) --------------------
@@ -911,6 +912,7 @@ visual-studio-code-bin
 
 # -------------------- ZarchBlack Tooling --------------------
 zarchblack-welcome
+zarchcare
 apparmor
 audit
 earlyoom
