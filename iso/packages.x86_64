@@ -922,6 +922,7 @@ visual-studio-code-bin
 
 # -------------------- ZarchBlack Tooling --------------------
 zarchblack-welcome
+zarchcare
 apparmor
 audit
 earlyoom
