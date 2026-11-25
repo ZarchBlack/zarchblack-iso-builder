@@ -66,7 +66,6 @@ linux-zen-headers
 mkinitcpio
 mkinitcpio-archiso
 mkinitcpio-nfs-utils
-mkinitcpio-openswap
 
 # -------------------- System Libraries & Dependencies --------------------
 boost
@@ -132,15 +131,12 @@ update-grub
 # ===================================================================
 bcachefs-tools
 btrfs-progs
-clonezilla
 cryptsetup
-ddrescue
 dosfstools
 e2fsprogs
 exfatprogs
 f2fs-tools
 fatresize
-fsarchiver
 fuse
 fuse3
 fuseiso
@@ -154,7 +150,6 @@ nilfs-utils
 ntfs-3g
 partclone
 parted
-partimage
 squashfs-tools
 testdisk
 udftools
@@ -174,7 +169,6 @@ cpupower
 power-profiles-daemon
 switcheroo-control
 thermald
-tlp
 
 # -------------------- Storage & Drive Tools --------------------
 dmraid
@@ -301,7 +295,6 @@ iftop
 iperf3
 ldns
 lftp
-linuxtoys-bin
 lynx
 mtr
 ndisc6
@@ -518,7 +511,6 @@ plasma-login-manager
 plasma-workspace-wallpapers
 plasma5support
 plymouth-kcm
-wacomtablet
 
 # -------------------- Plasma Components --------------------
 bluedevil
@@ -582,7 +574,6 @@ dolphin
 dolphin-plugins
 filelight
 gwenview
-kamera
 kcolorchooser
 kdegraphics-thumbnailers
 krusader
@@ -593,14 +584,11 @@ svgpart
 # -------------------- Network & Internet --------------------
 kdeconnect
 kdenetwork-filesharing
-kdenlive
 kget
 kio-admin
 kio-extras
 kio-gdrive
 kio-zeroconf
-krdc
-krfb
 signon-kwallet-extension
 smb4k
 
@@ -611,13 +599,11 @@ kate
 kcalc
 kcharselect
 kclock
-kcron
 kdebugsettings
 kdialog
 keditbookmarks
 kfind
 kgpg
-koko
 konsole
 ksystemlog
 kweather
@@ -632,9 +618,7 @@ yakuake
 audiocd-kio
 elisa
 ffmpegthumbs
-k3b
 kamoso
-phonon-qt6-vlc
 
 # -------------------- System Administration --------------------
 discover
@@ -645,44 +629,27 @@ kwallet-pam
 packagekit-qt6
 polkit-kde-agent
 systemdgenie
-vala
-
-# -------------------- Personal Information Management --------------------
-akregator
-kaddressbook
-merkuro
-
 
 # ===================================================================
 # 10. APPLICATIONS (GENERIC / CROSS-DESKTOP)
 # ===================================================================
 
 # -------------------- Web Browsers --------------------
-antigravity
 brave-origin
-thorium-browser-bin
-opencode-desktop
-
 
 # -------------------- Office & Productivity --------------------
-calibre
 gimp
 keepassxc
 krita
-libreoffice-still
 localsend
 media-downloader
 meld
 qbittorrent
 
 # -------------------- Multimedia Players --------------------
-audacity
-obs-studio
 vlc
 
 # -------------------- Accessibility --------------------
-brltty
-espeakup
 livecd-sounds
 orca
 
@@ -706,12 +673,10 @@ starship
 zoxide
 
 # -------------------- CLI Productivity & Monitoring --------------------
-asciinema
 bat
 bat-extras
 btop
 cava
-direnv
 duf
 dust
 eza
@@ -721,15 +686,11 @@ flameshot
 fzf
 gum
 htop
-hyperfine
-iotop
 ncdu
-nmon
 nvtop
 ranger
 ripgrep
 ripgrep-all
-screen
 semver
 tldr
 tmux
@@ -738,20 +699,15 @@ vim
 
 # -------------------- System Info & Debug --------------------
 exiftool
-figlet
 gdb
 ghex
 hexedit
 jq
-lolcat
 ltrace
 pkgstats
 rate-mirrors
 strace
 topgrade
-xdo
-xdotool
-
 
 # ===================================================================
 # 12. THEMING, ICONS, AND FONTS
@@ -885,7 +841,6 @@ zip
 # ===================================================================
 appstream-glib
 appstream-qt
-archinstall
 archlinux-appstream-data
 archlinux-keyring
 zarchblack-keyring
@@ -920,7 +875,6 @@ nbd
 numlockx
 ocs-url
 parallel
-preload
 pv
 python-dbus
 scx-tools
@@ -959,24 +913,18 @@ libadwaita
 plasma6-applets-plasmusic-toolbar
 qt6-svg
 variety
-vte4
-
+visual-studio-code-bin
 
 # ===================================================================
 # 19. SECURITY & HACKING TOOLS
 # ===================================================================
 
 # -------------------- ZarchBlack Tooling --------------------
-zarch-hacking
 zarchblack-welcome
-zarchguard
 apparmor
 audit
 earlyoom
 sbctl
-
-
-
 
 # ===================================================================
 # END OF MANIFEST
@@ -988,6 +936,3 @@ linux-firmware-atheros
 linux-firmware-mediatek
 linux-firmware-amdgpu
 dhcpcd
-dhclient
-r8168-dkms
-r8125-dkms
