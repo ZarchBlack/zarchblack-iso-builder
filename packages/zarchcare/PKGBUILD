@@ -3,7 +3,7 @@
 
 pkgname=zarchcare
 pkgver=2.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="ZarchBlack System Care Toolkit — system health, maintenance, driver management and diagnostics"
 arch=('x86_64')
 url="https://github.com/ZarchBlack"
@@ -21,12 +21,10 @@ provides=('zarchcare')
 conflicts=('zarchguard')
 replaces=('zarchguard')
 
-# المصدر: مجلد محلي مؤقتاً حتى يُرفع على GitHub
-source=("zarch-care-toolkit::git+file:///mnt/build/project-zarch-iso/zarch-care-toolkit")
+source=("zarch-care-toolkit::git+file:///mnt/build/project-zarch-iso/zarchblack_iso/iso/airootfs/opt/zarch-care-toolkit")
 sha256sums=('SKIP')
 
 build() {
-    # لا يوجد build step — Python لا يحتاج تجميع
     :
 }
 
@@ -34,42 +32,39 @@ package() {
     local _src="$srcdir/zarch-care-toolkit"
     local _share="$pkgdir/usr/share/zarchcare"
 
-    # ── تثبيت ملفات التطبيق ──────────────────────────────────────
     install -dm755 "$_share"
     install -Dm755 "$_src/main.py" "$_share/main.py"
     cp -r "$_src/core"      "$_share/"
     cp -r "$_src/ui"        "$_share/"
     cp -r "$_src/resources" "$_share/"
 
-    # حذف __pycache__ من النسخة المثبتة
     find "$_share" -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
     find "$_share" -name "*.pyc" -delete 2>/dev/null || true
 
-    # ── Executable wrapper ────────────────────────────────────────
+    # Executable wrapper
     install -dm755 "$pkgdir/usr/bin"
-    cat > "$pkgdir/usr/bin/zarchcare" << 'EOF'
+    cat > "$pkgdir/usr/bin/zarchcare" << 'WRAPEOF'
 #!/bin/bash
-# ZarchCare — ZarchBlack System Care Toolkit
 APP_DIR="/usr/share/zarchcare"
 cd "$APP_DIR" || exit 1
 exec python3 "$APP_DIR/main.py" "$@"
-EOF
+WRAPEOF
     chmod 755 "$pkgdir/usr/bin/zarchcare"
 
-    # ── Desktop entry ─────────────────────────────────────────────
+    # Desktop entry
     install -Dm644 "$_src/resources/zarchcare.desktop" \
         "$pkgdir/usr/share/applications/zarchcare.desktop"
 
-    # ── Polkit policy ─────────────────────────────────────────────
+    # Polkit policy
     install -Dm644 "$_src/resources/org.zarchblack.zarchcare.policy" \
         "$pkgdir/usr/share/polkit-1/actions/org.zarchblack.zarchcare.policy"
 
-    # ── Icons ─────────────────────────────────────────────────────
+    # Icons
     local _icon_base="$pkgdir/usr/share/icons/hicolor"
     for size in 16 24 32 48 64 128 256 512; do
         install -Dm644 "$_src/resources/icons/zarchcare-${size}.png" \
-            "$_icon_base/${size}x${size}/apps/zarchcare.png"
+            "$_icon_base/${size}x${size}/apps/zarchcare.png" 2>/dev/null || true
     done
     install -Dm644 "$_src/resources/icons/zarchcare.svg" \
-        "$_icon_base/scalable/apps/zarchcare.svg"
+        "$_icon_base/scalable/apps/zarchcare.svg" 2>/dev/null || true
 }
