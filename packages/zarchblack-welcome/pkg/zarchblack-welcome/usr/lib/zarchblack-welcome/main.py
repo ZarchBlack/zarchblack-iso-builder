@@ -486,12 +486,12 @@ class WelcomeWindow(QMainWindow):
             ("📦", "ZPackageManager",
              "Advanced package\nmanagement for Arch",
              "zpackagemanager"),
-            ("💻", "OpenCode Desktop",
-             "AI-powered development\nenvironment",
-             "opencode-desktop"),
             ("🔧", "System Settings",
              "KDE system configuration\nand customization",
              "systemsettings"),
+            ("🗂", "File Manager",
+             "Dolphin file manager\nbrowse your files",
+             "dolphin"),
         ]
         lay = QHBoxLayout()
         lay.setSpacing(12)
