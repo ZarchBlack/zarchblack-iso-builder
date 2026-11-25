@@ -90,3 +90,16 @@ pkg/
 # Package build artifacts
 packages/*/pkg/
 packages/*/src/
+
+# Security: Never commit keys, signatures, or tokens
+keys/*.gpg
+keys/*.key
+keys/*.asc
+*.gpg
+*.asc
+*.sig
+*.pem
+*.p12
+*.pfx
+*signing*.key
+*private*.key
