@@ -1,0 +1,621 @@
+#!/usr/bin/env python3
+"""
+ZarchBlack Welcome Center
+© 2026 ZarchBlack Project — https://github.com/ZarchBlack
+"""
+
+import sys
+import subprocess
+from pathlib import Path
+
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QLabel, QFrame, QScrollArea, QCheckBox, QGraphicsDropShadowEffect,
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QPropertyAnimation, QEasingCurve, QRect
+from PyQt6.QtGui import QPixmap, QFont, QFontDatabase, QIcon, QColor, QPainter, QLinearGradient
+
+BASE_DIR   = Path(__file__).resolve().parent
+ASSETS_DIR = BASE_DIR / "assets"
+LOGO_PATH  = ASSETS_DIR / "logo.png"
+
+AUTOSTART_FILE = Path.home() / ".config/autostart/zarchblack-welcome.desktop"
+AUTOSTART_CONTENT = """\
+[Desktop Entry]
+Type=Application
+Name=ZarchBlack Welcome Center
+Exec=zarchblack-welcome
+Icon=zarchblack-welcome
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+"""
+
+THEME = """
+* { font-family: "Inter", "SF Pro Display", "Segoe UI", "Ubuntu", sans-serif; }
+
+QMainWindow, QWidget#root {
+    background-color: #080810;
+}
+QScrollArea { background: transparent; border: none; }
+QWidget#scroll_content { background: transparent; }
+
+QScrollBar:vertical {
+    background: #0d0d1a; width: 5px;
+    border-radius: 2px; margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #2a1f5a; border-radius: 2px; min-height: 30px;
+}
+QScrollBar::handle:vertical:hover { background: #7c3aed; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+
+#InstallBtn {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+        stop:0 #7c3aed, stop:0.5 #9f4bff, stop:1 #c060ff);
+    color: #ffffff; border: none; border-radius: 14px;
+    font-size: 15px; font-weight: 700;
+    padding: 15px 56px; letter-spacing: 0.5px;
+}
+#InstallBtn:hover {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+        stop:0 #8b4cf5, stop:0.5 #ae5bff, stop:1 #d070ff);
+}
+#InstallBtn:pressed {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+        stop:0 #6d28d9, stop:1 #9040e0);
+}
+
+#ToolBtn {
+    background-color: #0e0e1c;
+    color: #e2e8f0;
+    border: 1px solid #1e1e38;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 20px 10px;
+    text-align: center;
+}
+#ToolBtn:hover {
+    background-color: #13132a;
+    border-color: #7c3aed;
+    color: #c084fc;
+}
+#ToolBtn:pressed {
+    background-color: #0f0f22;
+    border-color: #9f4bff;
+}
+
+#SocialBtn {
+    background-color: #0e0e1c;
+    color: #94a3b8;
+    border: 1px solid #1a1a30;
+    border-radius: 10px;
+    font-size: 13px;
+    padding: 10px 28px;
+}
+#SocialBtn:hover {
+    background-color: #13132a;
+    color: #c084fc;
+    border-color: #2a2a50;
+}
+
+#Divider { background-color: #14142a; max-height: 1px; min-height: 1px; }
+
+QCheckBox { color: #3a3a60; font-size: 12px; spacing: 8px; }
+QCheckBox::indicator {
+    width: 16px; height: 16px;
+    border-radius: 5px;
+    border: 1.5px solid #2a2a45;
+    background: #0e0e1c;
+}
+QCheckBox::indicator:checked {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+}
+QCheckBox::indicator:hover { border-color: #7c3aed; }
+
+#CloseBtn {
+    background: transparent;
+    color: #3a3a60;
+    border: 1px solid #1e1e38;
+    border-radius: 10px;
+    font-size: 13px;
+    padding: 8px 28px;
+}
+#CloseBtn:hover {
+    background: #0e0e1c;
+    color: #94a3b8;
+    border-color: #3a3a60;
+}
+
+#SectionLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: #9f4bff;
+    letter-spacing: 1.5px;
+    background: transparent;
+}
+"""
+
+
+class LaunchThread(QThread):
+    error_signal = pyqtSignal(str)
+
+    def __init__(self, cmd):
+        super().__init__()
+        self.cmd = cmd
+
+    def run(self):
+        try:
+            subprocess.Popen(
+                self.cmd, shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception as e:
+            self.error_signal.emit(str(e))
+
+
+class GlowLabel(QLabel):
+    """Label with a subtle purple glow effect."""
+    def __init__(self, text, parent=None):
+        super().__init__(text, parent)
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(28)
+        shadow.setColor(QColor(124, 58, 237, 160))
+        shadow.setOffset(0, 0)
+        self.setGraphicsEffect(shadow)
+
+
+class FeatureCard(QFrame):
+    def __init__(self, icon, title, desc, accent="#7c3aed", parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(90)
+        self.setStyleSheet(f"""
+            QFrame {{
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0e0e1c, stop:1 #111126);
+                border: 1px solid #1a1a32;
+                border-radius: 14px;
+            }}
+            QFrame:hover {{
+                border-color: {accent};
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #111128, stop:1 #14142e);
+            }}
+        """)
+
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(16, 14, 16, 14)
+        lay.setSpacing(14)
+
+        # Icon bubble
+        bubble = QFrame()
+        bubble.setFixedSize(42, 42)
+        bubble.setStyleSheet(f"""
+            QFrame {{
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 {accent}30, stop:1 {accent}15);
+                border: 1px solid {accent}50;
+                border-radius: 10px;
+            }}
+        """)
+        bl = QVBoxLayout(bubble)
+        bl.setContentsMargins(0, 0, 0, 0)
+        ic = QLabel(icon)
+        ic.setFont(QFont("Segoe UI Emoji", 18))
+        ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        ic.setStyleSheet("background:transparent;border:none;")
+        bl.addWidget(ic)
+        lay.addWidget(bubble, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        vl = QVBoxLayout()
+        vl.setSpacing(3)
+        t = QLabel(title)
+        t.setStyleSheet(
+            "color:#e2e8f0;font-weight:700;font-size:13px;"
+            "background:transparent;border:none;"
+        )
+        vl.addWidget(t)
+        d = QLabel(desc)
+        d.setStyleSheet(
+            "color:#64748b;font-size:11px;"
+            "background:transparent;border:none;"
+        )
+        d.setWordWrap(True)
+        vl.addWidget(d)
+        lay.addLayout(vl)
+
+
+class WelcomeWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Welcome to ZarchBlack")
+        self.setMinimumSize(900, 700)
+        self.resize(960, 760)
+        self._threads = []
+        if LOGO_PATH.exists():
+            self.setWindowIcon(QIcon(str(LOGO_PATH)))
+        self._build_ui()
+        self._center()
+
+    # ─────────────────────────── UI BUILD ────────────────────────────
+
+    def _build_ui(self):
+        root = QWidget()
+        root.setObjectName("root")
+        self.setCentralWidget(root)
+
+        outer = QVBoxLayout(root)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+
+        # Header banner (fixed, not scrollable)
+        outer.addWidget(self._banner())
+
+        # Scrollable body
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setStyleSheet("background:#080810;")
+        outer.addWidget(scroll)
+
+        body = QWidget()
+        body.setObjectName("scroll_content")
+        body.setStyleSheet("background:#080810;")
+        scroll.setWidget(body)
+
+        ml = QVBoxLayout(body)
+        ml.setContentsMargins(52, 32, 52, 36)
+        ml.setSpacing(0)
+
+        ml.addWidget(self._welcome_card());        ml.addSpacing(32)
+        ml.addWidget(self._section_label("✦  FEATURES"));  ml.addSpacing(12)
+        ml.addLayout(self._features());            ml.addSpacing(36)
+        ml.addWidget(self._divider());             ml.addSpacing(28)
+        ml.addWidget(self._install_card());        ml.addSpacing(36)
+        ml.addWidget(self._section_label("✦  ZARCHBLACK TOOLS")); ml.addSpacing(14)
+        ml.addLayout(self._tools());               ml.addSpacing(36)
+        ml.addWidget(self._divider());             ml.addSpacing(24)
+        ml.addWidget(self._section_label("✦  COMMUNITY & LINKS")); ml.addSpacing(12)
+        ml.addLayout(self._social());              ml.addSpacing(32)
+        ml.addStretch()
+        ml.addLayout(self._bottom())
+
+    # ─────────────────────────── BANNER ──────────────────────────────
+
+    def _banner(self):
+        banner = QFrame()
+        banner.setFixedHeight(120)
+        banner.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0a0818, stop:0.5 #0d0a22, stop:1 #080810);
+                border-bottom: 1px solid #14142a;
+            }
+        """)
+
+        lay = QHBoxLayout(banner)
+        lay.setContentsMargins(52, 20, 52, 20)
+        lay.setSpacing(20)
+
+        # Logo
+        if LOGO_PATH.exists():
+            logo_lbl = QLabel()
+            px = QPixmap(str(LOGO_PATH)).scaled(
+                72, 72,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            logo_lbl.setPixmap(px)
+            logo_lbl.setFixedSize(72, 72)
+            logo_lbl.setStyleSheet("background:transparent;")
+            lay.addWidget(logo_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        # Title block
+        vl = QVBoxLayout()
+        vl.setSpacing(4)
+
+        title = GlowLabel("ZarchBlack")
+        title.setStyleSheet(
+            "font-size:40px;font-weight:800;"
+            "color:#c084fc;"
+            "background:transparent;"
+            "letter-spacing:2px;"
+        )
+        vl.addWidget(title)
+
+        sub = QLabel("Freedom  •  Power  •  Simplicity")
+        sub.setStyleSheet(
+            "font-size:12px;color:#4a4a70;"
+            "background:transparent;letter-spacing:1px;"
+        )
+        vl.addWidget(sub)
+
+        ver = QLabel("Version 2026.11  •  KDE Plasma 6 on Wayland  •  Developed by Zero7x")
+        ver.setStyleSheet(
+            "font-size:10px;color:#2a2a48;background:transparent;"
+        )
+        vl.addWidget(ver)
+
+        lay.addLayout(vl)
+        lay.addStretch()
+
+        # Live badge
+        badge = QLabel("● LIVE")
+        badge.setStyleSheet("""
+            color: #22d3ee;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: #022a30;
+            border: 1px solid #164e63;
+            border-radius: 8px;
+            padding: 4px 12px;
+        """)
+        lay.addWidget(badge, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        return banner
+
+    # ─────────────────────────── WELCOME CARD ────────────────────────
+
+    def _welcome_card(self):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0d0d20, stop:1 #0f0e1e);
+                border: 1px solid #1a1a32;
+                border-radius: 16px;
+            }
+        """)
+        lay = QVBoxLayout(card)
+        lay.setContentsMargins(28, 22, 28, 22)
+        lay.setSpacing(0)
+
+        lbl = QLabel(
+            "Welcome to <span style='color:#c084fc;font-weight:800;'>ZarchBlack Linux</span>!<br><br>"
+            "ZarchBlack is a <b>rolling-release</b> distribution built on <b>Arch Linux</b>, "
+            "designed for developers, cybersecurity professionals, and system administrators.<br><br>"
+            "It ships with <b>KDE Plasma 6</b> on <b>Wayland</b>, pre-configured with the "
+            "<span style='color:#a78bfa;'>Catppuccin Mocha Lavender</span> theme, "
+            "<b>linux-zen</b> kernel for maximum performance, and a full suite of "
+            "development and security tools ready out of the box."
+        )
+        lbl.setWordWrap(True)
+        lbl.setTextFormat(Qt.TextFormat.RichText)
+        lbl.setStyleSheet(
+            "font-size:13px;line-height:1.6;color:#94a3b8;"
+            "background:transparent;border:none;"
+        )
+        lay.addWidget(lbl)
+        return card
+
+    # ─────────────────────────── FEATURES ────────────────────────────
+
+    def _features(self):
+        items = [
+            ("🖥", "KDE Plasma 6",       "Wayland-native with Catppuccin Mocha Lavender theme",    "#7c3aed"),
+            ("🛡", "ZarchCare Suite",    "System health, maintenance & diagnostics toolkit",        "#0ea5e9"),
+            ("⚡", "linux-zen Kernel",   "Optimized for responsiveness and low latency",            "#f59e0b"),
+            ("📦", "Smart Packaging",    "Pacman + Chaotic-AUR + Flatpak + zpackagemanager",        "#10b981"),
+            ("🎨", "Full Customization", "Darkly / Kvantum / Layan Decorations / Custom Icons",    "#ec4899"),
+            ("🌐", "Wayland Native",     "Default Wayland session with full app compatibility",    "#6366f1"),
+        ]
+        gl = QVBoxLayout()
+        gl.setSpacing(10)
+        r1 = QHBoxLayout(); r1.setSpacing(10)
+        r2 = QHBoxLayout(); r2.setSpacing(10)
+        for i, (ic, t, d, accent) in enumerate(items):
+            (r1 if i < 3 else r2).addWidget(FeatureCard(ic, t, d, accent))
+        gl.addLayout(r1)
+        gl.addLayout(r2)
+        return gl
+
+    # ─────────────────────────── INSTALL ─────────────────────────────
+
+    def _install_card(self):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0e0a1e, stop:0.5 #120e28, stop:1 #0e0a1e);
+                border: 1px solid #2a1f5a;
+                border-radius: 20px;
+            }
+        """)
+
+        # Glow effect on card
+        shadow = QGraphicsDropShadowEffect(card)
+        shadow.setBlurRadius(40)
+        shadow.setColor(QColor(124, 58, 237, 60))
+        shadow.setOffset(0, 4)
+        card.setGraphicsEffect(shadow)
+
+        lay = QVBoxLayout(card)
+        lay.setContentsMargins(36, 28, 36, 28)
+        lay.setSpacing(10)
+
+        t = QLabel("🚀   Install ZarchBlack to Your Drive")
+        t.setStyleSheet(
+            "font-size:18px;font-weight:800;color:#e2e8f0;"
+            "background:transparent;letter-spacing:0.5px;"
+        )
+        t.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(t)
+
+        d = QLabel(
+            "Click the button below to install ZarchBlack on your hard drive "
+            "using the Calamares graphical installer."
+        )
+        d.setWordWrap(True)
+        d.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        d.setStyleSheet(
+            "font-size:13px;color:#64748b;background:transparent;"
+        )
+        lay.addWidget(d)
+        lay.addSpacing(8)
+
+        row = QHBoxLayout()
+        row.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn = QPushButton("   ⬇   Install ZarchBlack   ")
+        btn.setObjectName("InstallBtn")
+        btn.setFixedHeight(54)
+        btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn.clicked.connect(self._calamares)
+
+        # Glow on button
+        btn_shadow = QGraphicsDropShadowEffect(btn)
+        btn_shadow.setBlurRadius(24)
+        btn_shadow.setColor(QColor(159, 75, 255, 180))
+        btn_shadow.setOffset(0, 4)
+        btn.setGraphicsEffect(btn_shadow)
+
+        row.addWidget(btn)
+        lay.addLayout(row)
+        return card
+
+    # ─────────────────────────── TOOLS ───────────────────────────────
+
+    def _tools(self):
+        items = [
+            ("🛡", "ZarchCare",
+             "System health toolkit\nMaintenance & diagnostics",
+             "zarchcare"),
+            ("📦", "ZPackageManager",
+             "Advanced package\nmanagement for Arch",
+             "zpackagemanager"),
+            ("💻", "OpenCode Desktop",
+             "AI-powered development\nenvironment",
+             "opencode-desktop"),
+            ("🔧", "System Settings",
+             "KDE system configuration\nand customization",
+             "systemsettings"),
+        ]
+        lay = QHBoxLayout()
+        lay.setSpacing(12)
+
+        for ic, nm, ds, cmd in items:
+            b = QPushButton(f"{ic}\n\n{nm}\n{ds}")
+            b.setObjectName("ToolBtn")
+            b.setMinimumHeight(120)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _, c=cmd: self._launch(c))
+            lay.addWidget(b)
+
+        return lay
+
+    # ─────────────────────────── SOCIAL ──────────────────────────────
+
+    def _social(self):
+        links = [
+            ("🌐  Website",   "https://zarchblack.pages.dev/"),
+            ("  GitHub",   "https://github.com/ZarchBlack"),
+            ("💬  Discord",   "https://discord.gg/YgVtrsCx"),
+            ("📢  Telegram",  "https://t.me/zarchblack"),
+        ]
+        lay = QHBoxLayout()
+        lay.setSpacing(10)
+        lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        for label, url in links:
+            b = QPushButton(label)
+            b.setObjectName("SocialBtn")
+            b.setFixedHeight(42)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(
+                lambda _, u=url: subprocess.Popen(
+                    ["xdg-open", u],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+            )
+            lay.addWidget(b)
+
+        return lay
+
+    # ─────────────────────────── BOTTOM BAR ──────────────────────────
+
+    def _bottom(self):
+        lay = QHBoxLayout()
+
+        self.cb = QCheckBox("Show this window on startup")
+        self.cb.setChecked(AUTOSTART_FILE.exists())
+        self.cb.stateChanged.connect(self._toggle_autostart)
+        lay.addWidget(self.cb)
+        lay.addStretch()
+
+        cb = QPushButton("Close")
+        cb.setObjectName("CloseBtn")
+        cb.setFixedSize(110, 38)
+        cb.setCursor(Qt.CursorShape.PointingHandCursor)
+        cb.clicked.connect(self.close)
+        lay.addWidget(cb)
+        return lay
+
+    # ─────────────────────────── HELPERS ─────────────────────────────
+
+    def _divider(self):
+        d = QFrame()
+        d.setObjectName("Divider")
+        d.setFrameShape(QFrame.Shape.HLine)
+        return d
+
+    def _section_label(self, text):
+        l = QLabel(text)
+        l.setObjectName("SectionLabel")
+        return l
+
+    def _center(self):
+        g = QApplication.primaryScreen().geometry()
+        self.move(
+            (g.width() - self.width()) // 2,
+            (g.height() - self.height()) // 2,
+        )
+
+    def _calamares(self):
+        t = LaunchThread(
+            "pkexec calamares 2>/dev/null "
+            "|| sudo calamares 2>/dev/null "
+            "|| calamares"
+        )
+        self._threads.append(t)
+        t.start()
+
+    def _launch(self, cmd):
+        t = LaunchThread(cmd)
+        self._threads.append(t)
+        t.start()
+
+    def _toggle_autostart(self, state):
+        if state == 2:
+            AUTOSTART_FILE.parent.mkdir(parents=True, exist_ok=True)
+            AUTOSTART_FILE.write_text(AUTOSTART_CONTENT)
+        elif AUTOSTART_FILE.exists():
+            AUTOSTART_FILE.unlink()
+
+
+# ─────────────────────────────── MAIN ────────────────────────────────────────
+
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("ZarchBlack Welcome")
+    app.setOrganizationName("ZarchBlack")
+    app.setDesktopFileName("zarchblack-welcome")
+    app.setStyleSheet(THEME)
+
+    for font_path in [
+        "/usr/share/fonts/inter/Inter-Regular.otf",
+        "/usr/share/fonts/inter/Inter-Bold.otf",
+        "/usr/share/fonts/inter/Inter-SemiBold.otf",
+    ]:
+        QFontDatabase.addApplicationFont(font_path)
+
+    win = WelcomeWindow()
+    win.show()
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()

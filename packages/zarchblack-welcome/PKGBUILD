@@ -2,7 +2,7 @@
 # ZarchBlack Welcome Center - First-run welcome screen
 
 pkgname=zarchblack-welcome
-pkgver=2.0.0
+pkgver=2.1.0
 pkgrel=1
 pkgdesc="ZarchBlack Welcome Center - First-run welcome screen with installer and tool launcher"
 arch=('any')
