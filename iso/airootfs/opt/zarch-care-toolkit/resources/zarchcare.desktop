@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=ZarchCare
+Name[ar]=عناية زارك
+Comment=System diagnostics, drivers and maintenance for ZarchBlack
+Comment[ar]=تشخيص وصيانة وتعريفات نظام ZarchBlack
+Exec=/usr/bin/zarchcare
+Icon=zarchcare
+Terminal=false
+Type=Application
+Categories=System;Settings;
+Keywords=arch;system;drivers;maintenance;تشخيص;صيانة;

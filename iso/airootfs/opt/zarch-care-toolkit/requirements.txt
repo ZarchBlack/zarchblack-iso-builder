@@ -1,0 +1,4 @@
+# ملاحظة: على Arch Linux/ZarchBlack يُفضَّل التثبيت عبر pacman وليس pip:
+#   sudo pacman -S pyside6
+# استخدم هذا الملف فقط في بيئة pip منفصلة (مثلاً venv خارج التوزيعة)
+PySide6>=6.6

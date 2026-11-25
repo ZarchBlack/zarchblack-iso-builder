@@ -62,3 +62,40 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 # 13. Enable Firewalld and fix KDE Connect
 systemctl enable firewalld.service || true
 firewall-offline-cmd --zone=public --add-service=kdeconnect || true
+
+# 14. Install ZarchCare (System Health Toolkit)
+ZARCHCARE_SRC="/opt/zarch-care-toolkit"
+ZARCHCARE_DST="/usr/share/zarchcare"
+
+if [ -d "$ZARCHCARE_SRC" ]; then
+    install -dm755 "$ZARCHCARE_DST"
+    cp -r "$ZARCHCARE_SRC/core" "$ZARCHCARE_DST/"
+    cp -r "$ZARCHCARE_SRC/ui" "$ZARCHCARE_DST/"
+    cp -r "$ZARCHCARE_SRC/resources" "$ZARCHCARE_DST/"
+    install -Dm755 "$ZARCHCARE_SRC/main.py" "$ZARCHCARE_DST/main.py"
+
+    # Executable
+    cat > /usr/bin/zarchcare << 'WRAPPER'
+#!/bin/bash
+cd /usr/share/zarchcare && exec python3 main.py "$@"
+WRAPPER
+    chmod 755 /usr/bin/zarchcare
+
+    # Desktop entry & icons
+    install -Dm644 "$ZARCHCARE_SRC/resources/zarchcare.desktop" \
+        /usr/share/applications/zarchcare.desktop
+    install -Dm644 "$ZARCHCARE_SRC/resources/org.zarchblack.zarchcare.policy" \
+        /usr/share/polkit-1/actions/org.zarchblack.zarchcare.policy
+    for size in 16 24 32 48 64 128 256 512; do
+        install -Dm644 "$ZARCHCARE_SRC/resources/icons/zarchcare-${size}.png" \
+            "/usr/share/icons/hicolor/${size}x${size}/apps/zarchcare.png"
+    done
+    install -Dm644 "$ZARCHCARE_SRC/resources/icons/zarchcare.svg" \
+        /usr/share/icons/hicolor/scalable/apps/zarchcare.svg
+
+    # Clean pyc
+    find "$ZARCHCARE_DST" -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+    echo "ZarchCare installed successfully."
+else
+    echo "Warning: ZarchCare source not found at $ZARCHCARE_SRC — skipping."
+fi

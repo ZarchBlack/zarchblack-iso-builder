@@ -494,14 +494,12 @@ plasma-systemmonitor
 plasma-thunderbolt
 plasma-vault
 plasma-workspace
-plasma-x11-session
 
 breeze-cursors
 breeze-plymouth
 knighttime
 kwayland
 kwin
-kwin-x11
 libplasma
 oxygen-cursors
 plasma-activities
@@ -520,7 +518,6 @@ drkonqi
 kde-gtk-config
 kde-inotify-survey
 kde-system-meta
-kgamma
 kglobalacceld
 kinfocenter
 kpipewire
@@ -569,7 +566,6 @@ plasma6-applets-kurve
 
 # -------------------- File Management --------------------
 ark
-colord-kde
 dolphin
 dolphin-plugins
 filelight
@@ -874,7 +870,6 @@ lsb-release
 mtools
 nbd
 numlockx
-ocs-url
 parallel
 pv
 python-dbus
@@ -922,7 +917,6 @@ visual-studio-code-bin
 
 # -------------------- ZarchBlack Tooling --------------------
 zarchblack-welcome
-zarchcare
 apparmor
 audit
 earlyoom
