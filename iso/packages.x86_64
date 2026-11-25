@@ -137,7 +137,7 @@ e2fsprogs
 exfatprogs
 f2fs-tools
 fatresize
-fuse
+fuse3
 fuse3
 fuseiso
 gpart
@@ -230,7 +230,6 @@ skanpage
 # -------------------- Virtualization & Guest Agents --------------------
 dnsmasq
 edk2-ovmf
-iptables-nft
 libvirt
 qemu-desktop
 virt-manager
@@ -268,14 +267,12 @@ nm-connection-editor
 
 # -------------------- Core Networking Tools --------------------
 dhclient
-dnsutils
 iproute2
 iw
 iwd
 net-tools
 nftables
 reflector
-rfkill
 systemd-resolvconf
 wireless-regdb
 wireless_tools
@@ -284,7 +281,7 @@ wpa_supplicant
 # -------------------- Network Utilities & Diagnostics --------------------
 alacritty
 aria2
-bind-tools
+bind
 bmon
 cifs-utils
 curl
@@ -632,7 +629,7 @@ systemdgenie
 
 # -------------------- Web Browsers --------------------
 antigravity
-brave-origin
+brave-bin
 
 # -------------------- Office & Productivity --------------------
 gimp
@@ -695,7 +692,7 @@ tree
 vim
 
 # -------------------- System Info & Debug --------------------
-exiftool
+perl-image-exiftool
 gdb
 ghex
 hexedit
@@ -774,7 +771,7 @@ ttf-ubuntu-font-family
 # ===================================================================
 
 # -------------------- Build Essentials --------------------
-pkg-config
+pkgconf
 
 # -------------------- Python (System & Tools) --------------------
 python
@@ -857,7 +854,7 @@ yay
 # ===================================================================
 arandr
 chrony
-dbus-python
+python-dbus
 dex
 encfs
 firejail
