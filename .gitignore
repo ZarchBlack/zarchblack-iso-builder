@@ -103,3 +103,8 @@ keys/*.asc
 *.pfx
 *signing*.key
 *private*.key
+
+# airootfs — files provided by packages (don't duplicate in airootfs)
+iso/airootfs/usr/share/applications/brave-origin.desktop
+iso/airootfs/usr/share/icons/hicolor/*/apps/brave-origin.png
+iso/airootfs/usr/lib/zarchblack-welcome/main.py
